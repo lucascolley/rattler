@@ -677,9 +677,9 @@ dependencies = [
 
 [[package]]
 name = "aws-smithy-runtime"
-version = "1.8.4"
+version = "1.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3aaec682eb189e43c8a19c3dab2fe54590ad5f2cc2d26ab27608a20f2acf81c"
+checksum = "660f70d9d8af6876b4c9aa8dcb0dbaf0f89b04ee9a4455bea1b4ba03b15f26f6"
 dependencies = [
  "aws-smithy-async",
  "aws-smithy-http 0.62.2",
@@ -701,9 +701,9 @@ dependencies = [
 
 [[package]]
 name = "aws-smithy-runtime-api"
-version = "1.8.3"
+version = "1.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9852b9226cb60b78ce9369022c0df678af1cac231c882d5da97a0c4e03be6e67"
+checksum = "38280ac228bc479f347fcfccf4bf4d22d68f3bb4629685cb591cabd856567bbc"
 dependencies = [
  "aws-smithy-async",
  "aws-smithy-types",
@@ -2921,9 +2921,9 @@ dependencies = [
 
 [[package]]
 name = "io-uring"
-version = "0.7.8"
+version = "0.7.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b86e202f00093dcba4275d4636b93ef9dd75d025ae560d2521b45ea28ab49013"
+checksum = "d93587f37623a1a17d94ef2bc9ada592f5465fe7732084ab7beefabe5c77c0c4"
 dependencies = [
  "bitflags 2.9.1",
  "cfg-if",
@@ -4739,7 +4739,7 @@ dependencies = [
 
 [[package]]
 name = "rattler_repodata_gateway"
-version = "0.23.8"
+version = "0.23.9"
 dependencies = [
  "anyhow",
  "assert_matches",
