@@ -403,6 +403,19 @@ pub fn solve_min_age_exemption_channel<T: SolverImpl + Default>() {
         .expect_present([("pkg-a", "1.0")])
         .expect_absent([("pkg-a", "2.0")])
         .run::<T>();
+
+    for channel in ["https://prefix.dev/vetted", "https://prefix.dev/vetted/"] {
+        let config = exclude_newer_duration_config(min_age)
+            .with_exemption(format!("{channel}::pkg-a ==2.0").parse().unwrap())
+            .unwrap();
+
+        SolverCase::new(channel)
+            .repository(repo_in("https://prefix.dev/vetted/"))
+            .specs(["pkg-a"])
+            .exclude_newer(config)
+            .expect_present([("pkg-a", "2.0")])
+            .run::<T>();
+    }
 }
 
 /// Test that an exemption with a subdir or file name only applies to records
