@@ -440,3 +440,39 @@ pub fn solve_min_age_exemption_subdir_and_file_name<T: SolverImpl + Default>() {
             .run::<T>();
     }
 }
+
+/// Test that an exemption also covers records without an indexed timestamp
+/// under [`TimestampPolicy::RequireIndexedTimestamp`].
+pub fn solve_min_age_exemption_indexed_timestamp<T: SolverImpl + Default>() {
+    let mut old = PackageBuilder::new("pkg-a").version("1.0").build();
+    old.package_record.indexed_timestamp =
+        Some("2020-01-15T12:00:00Z".parse::<Timestamp>().unwrap().into());
+    // Only has a build timestamp, which this policy ignores.
+    let new = PackageBuilder::new("pkg-a")
+        .version("2.0")
+        .timestamp("2020-01-15T12:00:00Z")
+        .build();
+
+    let min_age = std::time::Duration::from_secs(1000 * 24 * 60 * 60);
+    let config = exclude_newer_duration_config(min_age)
+        .with_timestamp_policy(TimestampPolicy::RequireIndexedTimestamp);
+
+    SolverCase::new("min_age indexed timestamp without exemption")
+        .repository(vec![old.clone(), new.clone()])
+        .specs(["pkg-a"])
+        .exclude_newer(config.clone())
+        .expect_present([("pkg-a", "1.0")])
+        .expect_absent([("pkg-a", "2.0")])
+        .run::<T>();
+
+    SolverCase::new("min_age indexed timestamp with exemption")
+        .repository(vec![old, new])
+        .specs(["pkg-a"])
+        .exclude_newer(
+            config
+                .with_exemption("pkg-a ==2.0".parse().unwrap())
+                .unwrap(),
+        )
+        .expect_present([("pkg-a", "2.0")])
+        .run::<T>();
+}
