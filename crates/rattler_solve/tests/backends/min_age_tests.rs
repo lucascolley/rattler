@@ -476,3 +476,36 @@ pub fn solve_min_age_exemption_indexed_timestamp<T: SolverImpl + Default>() {
         .expect_present([("pkg-a", "2.0")])
         .run::<T>();
 }
+
+/// Test that an exemption overrides a stricter channel cutoff.
+pub fn solve_min_age_exemption_channel_cutoff<T: SolverImpl + Default>() {
+    let repo: Vec<_> = create_timestamped_repo()
+        .into_iter()
+        .map(|mut record| {
+            record.channel = Some("strict".to_string());
+            record
+        })
+        .collect();
+
+    let config = exclude_newer_duration_config(std::time::Duration::ZERO)
+        .with_channel_cutoff("strict", "2021-01-01T00:00:00Z".parse().unwrap());
+
+    SolverCase::new("min_age channel cutoff without exemption")
+        .repository(repo.clone())
+        .specs(["pkg-a"])
+        .exclude_newer(config.clone())
+        .expect_present([("pkg-a", "1.0")])
+        .expect_absent([("pkg-a", "2.0")])
+        .run::<T>();
+
+    SolverCase::new("min_age channel cutoff with exemption")
+        .repository(repo)
+        .specs(["pkg-a"])
+        .exclude_newer(
+            config
+                .with_exemption("pkg-a ==2.0".parse().unwrap())
+                .unwrap(),
+        )
+        .expect_present([("pkg-a", "2.0")])
+        .run::<T>();
+}

@@ -579,6 +579,11 @@ macro_rules! solver_backend_tests {
         }
 
         #[test]
+        fn test_min_age_exemption_channel_cutoff() {
+            crate::min_age_tests::solve_min_age_exemption_channel_cutoff::<$T>();
+        }
+
+        #[test]
         fn resolvo_issue_188() {
             crate::solver_case_tests::resolvo_issue_188::<$T>();
         }
