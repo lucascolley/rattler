@@ -430,3 +430,54 @@ pub fn task_for_repodata(
         })
         .collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use clap::Parser;
+
+    use super::*;
+
+    #[derive(Parser)]
+    struct Cli {
+        #[clap(flatten)]
+        solver: SolverArgs,
+    }
+
+    fn exclude_newer(args: &[&str]) -> miette::Result<Option<rattler_solve::ExcludeNewer>> {
+        let cli =
+            Cli::try_parse_from(std::iter::once("rattler").chain(args.iter().copied())).unwrap();
+        let channel_config = ChannelConfig::default_with_root_dir(std::env::current_dir().unwrap());
+        cli.solver.exclude_newer(&channel_config)
+    }
+
+    #[test]
+    fn test_exclude_newer_exemptions() {
+        let config = exclude_newer(&[
+            "--exclude-newer",
+            "2006-12-02T02:07:43Z",
+            "--exclude-newer-exemption",
+            "pkg-a ==1.0",
+            "--exclude-newer-exemption",
+            "pkg-b ==2.0",
+        ])
+        .unwrap();
+
+        let expected =
+            rattler_solve::ExcludeNewer::from_datetime("2006-12-02T02:07:43Z".parse().unwrap())
+                .with_exemption("pkg-a ==1.0".parse().unwrap())
+                .unwrap()
+                .with_exemption("pkg-b ==2.0".parse().unwrap())
+                .unwrap();
+        assert_eq!(config, Some(expected));
+
+        assert!(
+            exclude_newer(&[
+                "--exclude-newer",
+                "2006-12-02T02:07:43Z",
+                "--exclude-newer-exemption",
+                "pkg-*",
+            ])
+            .is_err()
+        );
+    }
+}
